@@ -1,0 +1,213 @@
+<form class='mt-4' name="container-form" method="POST" action="/courses/handle-form-stored-action">
+    <div style="justify-content: space-between; display: flex;">
+        <h1>Khoá học của tôi</h1>
+        <button class="btn btn-light" style="padding: 0; border: 0;">
+            <a class="d-flex" href="/me/trash/courses" style="padding: 6px 12px; height: 100%; align-items: center">Khoá học đã xoá ({{deletedCount}})</a>
+        </button>
+    </div>
+
+    <div class="mt-4 d-flex align-items-center">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="" id="checkbox-all">
+            <label class="form-check-label" for="checkbox-all">
+                Chọn tất cả
+            </label>
+        </div>
+
+        <select class="form-control form-control-sm" name="action" required style="width: 180px; margin: 0 12px">
+            <option value="" selected>-- Chọn hành động --</option>
+            <option value="delete">Xoá mục đã chọn</option>
+        </select>
+
+        <button class="btn btn-primary btn-sm enabled-action-submit-btn" disabled>Thực hiện</button>
+    </div>
+
+    <table class='table table-striped mt-4'>
+        <thead>
+            <tr>
+                <th scope='col'>#</th>
+                {{!-- sortable: Tính năng cho phép sắp xếp --}}
+                {{!-- Truyền qua helpers/handlebars --}}
+                {{!-- Khi giá trị nằm trong {{giá trị}} => html trả về dạng special characters --}}
+                {{!-- Khi giá trị nằm trong {{{giá trị}}} => html trả về dạng nguyên mẫu --}}
+                <th scope='col'>
+                    ID
+                    {{{sortable '_id' _sort}}}
+                </th>
+                <th scope='col'>
+                    Tên khoá học
+                    {{{sortable 'name' _sort}}}
+                </th>
+                <th scope='col'>
+                    Trình độ
+                    {{{sortable 'level' _sort}}}
+                </th>
+                <th scope='col' colspan='2'>
+                    Ngày khởi tạo
+                    {{{sortable 'createdAt' _sort}}}
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each courses}}
+                <tr>
+                    <td>
+                        <div class="form-check">
+                            <input 
+                                class="form-check-input" 
+                                type="checkbox" name="courseIds[]" 
+                                value="{{this._id}}" 
+                                style="width: 16px; height: 16px;"
+                            >
+                        </div>
+                    </td>
+                    <th scope='row'>{{this._id}}</th>
+                    <td>{{this.name}}</td>
+                    <td>{{this.level}}</td>
+                    <td>{{this.createdAt}}</td>
+                    <td>
+                        <a 
+                            href='/courses/{{this._id}}/edit' 
+                            class='d-block btn btn-primary mb-2'
+                        >Sửa</a>
+
+                        <a
+                            href=''
+                            class='d-block btn btn-danger'
+                            data-toggle='modal'
+                            data-target='#delete-course'
+                            data-id="{{this._id}}"
+                        >Xoá</a>
+                    </td>
+                </tr>
+            {{else}}
+                <tr>
+                    <td colspan="5" class="text-center">
+                        Bạn chưa đăng khoá học nào cả!
+                        <a href='/courses/create' class='btn btn-primary'>Thêm khoá học mới tại đây</a>
+                    </td>
+                </tr>
+            {{/each}}
+        </tbody>
+    </table>
+
+    {{!-- Pagination --}}
+    <nav aria-label="Page navigation example">
+            <div class="d-flex justify-content-center">
+                <btn class="btn btn-primary">Tổng các khoá học: {{totalDocument}}</btn>
+                <btn class="btn btn-success ml-2">Trang hiện tại: {{currPage}}</btn>
+            </div>
+        <ul class="pagination justify-content-center mt-2">
+            <li class="page-item">
+                <a class="page-link" href="/me/stored/courses/page-1">Trang đầu</a>
+            </li>           
+            <li class="page-item">
+                <a class="page-link prev-page-link" href="/me/stored/courses/page-{{nextPrevPage currPage -1}}">Trang trước</a>
+            </li>
+            {{{eachPaginate lastPage}}}
+            <li class="page-item">
+                <a class="page-link next-page-link" href="/me/stored/courses/page-{{nextPrevPage currPage 1}}">Trang sau</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="/me/stored/courses/page-{{lastPage}}">Trang cuối</a>
+            </li>
+        </ul>           
+    </nav>
+</form>
+
+{{! Confirm Delete Course }}
+<div id='delete-course' class='modal fade' tabindex='-1' role='dialog'>
+    <div class='modal-dialog' role='document'>
+        <div class='modal-content'>
+            <div class='modal-header'>
+                <h5 class='modal-title'>Xác nhận lựa chọn của bạn</h5>
+                <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+                    <span aria-hidden='true'>&times;</span>
+                </button>
+            </div>
+            <div class='modal-body'>
+                <p>Bạn chắc chắn muốn xoá bỏ khoá học này?</p>
+            </div>
+            <div class='modal-footer'>
+                <button id="btn-delete-course" type='button' class='btn btn-danger'>Vẫn xoá</button>
+                <button type='button' class='btn btn-primary' data-dismiss='modal'>Giữ lại</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    {{!-- Form delete course --}}
+<form name="form-delete-course" method='POST'></form>
+
+<script>
+    // Khi nào DOM content load xong mới chạy đoạn code này
+    document.addEventListener('DOMContentLoaded', function () {
+        var courseId;
+        var btnDeleteCourse = document.getElementById('btn-delete-course');
+        var deleteForm = document.forms['form-delete-course'];
+        var checkboxAll = $('#checkbox-all');
+        var courseItemCheckbox = $('input[name="courseIds[]"]');
+        var enabledActionBtn = $('.enabled-action-submit-btn');
+        var prevPageLink = $('.prev-page-link');
+        var nextPageLink = $('.next-page-link');
+
+        // Trỏ tới data-id khi bấm nút xoá => show modal
+        $('#delete-course').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            courseId = button.data('id');
+        });
+
+        // Khi confirm delete
+        btnDeleteCourse.onclick = function () {
+            // Thêm attribute action='/courses/{{course._id}}?_method=DELETE' và submit
+            deleteForm.action = '/courses/' + courseId + '?_method=DELETE';
+            deleteForm.submit();
+        };
+
+        // checkbox-all changed 
+        checkboxAll.change(function () {
+            var isCheckedAll = $(this).prop('checked');
+            courseItemCheckbox.prop('checked', isCheckedAll);
+            enabledActionSubmitBtn();
+        });
+
+        // course-checkbox changed 
+        courseItemCheckbox.change(function() {
+            var isCheckedAll = courseItemCheckbox.length === $('input[name="courseIds[]"]:checked').length;
+            checkboxAll.prop('checked', isCheckedAll);
+            enabledActionSubmitBtn();
+        })
+
+        // Re-render enabled-action-submit-btn 
+        function enabledActionSubmitBtn() {
+            var checkedCount = $('input[name="courseIds[]"]:checked').length;
+            
+            if (checkedCount) {
+                enabledActionBtn.attr('disabled', false);
+            } else {
+                enabledActionBtn.attr('disabled', true);
+            }
+        }
+
+        // Prev-Page
+        prevPageLink.click(function (e) {
+            let prevPageId = {{nextPrevPage currPage -1}}
+            
+            if (prevPageId === 0) {
+                prevPageLink.addClass('btn-danger');
+                e.preventDefault();
+            }
+        })
+
+        // Next-Page
+        nextPageLink.click(function (e) {
+            let nextPageId = {{nextPrevPage currPage 1}}
+            let lastPageId = {{lastPage}};
+            
+            if (nextPageId === (lastPageId + 1)) {
+                nextPageLink.addClass('btn-danger');
+                e.preventDefault();
+            }
+        })
+    });
+</script>

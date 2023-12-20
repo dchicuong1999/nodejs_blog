@@ -1,0 +1,71 @@
+<div class='mt-4'>
+    <h2>SỬA KHOÁ HỌC</h2>
+
+    <form class='mt-4' method='POST' action='/courses/{{course._id}}?_method=PUT'>
+        <div class='form-group'>
+            <label for='name'>Nhập tên khoá học</label>
+            <input
+                type='text'
+                class='form-control'
+                value='{{course.name}}'
+                id='name'
+                placeholder='Nhập tên khoá học...'
+                name='name'
+            />
+        </div>
+
+        <div class='form-group'>
+            <label for='description'>Mô tả khoá học</label>
+            <textarea class='form-control' id='description' name='description'>{{course.description}}</textarea>
+        </div>
+
+        <div class='form-group'>
+            <label for='videoId'>Video ID</label>
+            <input
+                type='text'
+                class='form-control'
+                value='{{course.videoId}}'
+                id='videoId'
+                placeholder='Nhập Video ID...'
+                name='videoId'
+            />
+        </div>
+
+        <div class='form-group'>
+            <label for='level'>Trình độ</label>
+            <input
+                type='text'
+                class='form-control'
+                value='{{course.level}}'
+                id='level'
+                placeholder='Nhập trình độ...'
+                name='level'
+            />
+        </div>
+
+        <div class='form-group'>
+            <label for='courseTotal'>Tổng số bài học</label>
+            <input
+                type='number'
+                class='form-control'
+                value='{{course.courseTotal}}'
+                id='courseTotal'
+                placeholder='Nhập tổng số bài học...'
+                name='courseTotal'
+            />
+        </div>
+
+        <div class='form-group'>
+            <label for='timeTotal'>Tổng số giờ hoàn thành khoá học</label>
+            <input
+                type='number'
+                class='form-control'
+                value='{{course.timeTotal}}'
+                id='timeTotal'
+                placeholder='Nhập tổng thời lượng khoá học (giờ)...'
+                name='timeTotal'
+            />
+        </div>
+        <button type='submit' class='btn btn-primary'>Lưu chỉnh sửa</button>
+    </form>
+</div>
