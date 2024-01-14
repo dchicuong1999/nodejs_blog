@@ -13,7 +13,7 @@ class MeController {
         let courseQuery = Course.find({});
 
         // Pagination
-        let limitPerPage = 2;
+        let limitPerPage = 4;
         let currPage = req.params.page || 1;
 
         if (currPage < 1) {

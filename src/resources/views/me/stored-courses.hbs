@@ -94,8 +94,8 @@
     {{!-- Pagination --}}
     <nav aria-label="Page navigation example">
             <div class="d-flex justify-content-center">
-                <btn class="btn btn-primary">Tổng các khoá học: {{totalDocument}}</btn>
-                <btn class="btn btn-success ml-2">Trang hiện tại: {{currPage}}</btn>
+                <btn class="btn btn-primary" style="pointer-events: none;">Tổng các khoá học: {{totalDocument}}</btn>
+                <btn class="btn btn-success ml-2" style="pointer-events: none;">Trang hiện tại: {{currPage}}</btn>
             </div>
         <ul class="pagination justify-content-center mt-2">
             <li class="page-item">
@@ -104,7 +104,7 @@
             <li class="page-item">
                 <a class="page-link prev-page-link" href="/me/stored/courses/page-{{nextPrevPage currPage -1}}">Trang trước</a>
             </li>
-            {{{eachPaginate lastPage}}}
+            {{{eachPaginate currPage lastPage}}}
             <li class="page-item">
                 <a class="page-link next-page-link" href="/me/stored/courses/page-{{nextPrevPage currPage 1}}">Trang sau</a>
             </li>

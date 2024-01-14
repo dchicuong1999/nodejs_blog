@@ -45,16 +45,20 @@ module.exports = {
     },
     
     // Pagination
-    eachPaginate: (lastPage) => {           
-        let tagPageId = '';
+    eachPaginate: (currPage, lastPage) => {           
+        let tagPage = '';
+        let currPageId = Number(currPage);
 
         for (let i = 1; i <= lastPage; i++) {
-            tagPageId += `<li class="page-item">
-                            <a class="page-link" href="/me/stored/courses/page-${i}">
+            const btnActive = currPageId === i ? 'btn-danger' : '';
+            const styleActive = btnActive ? 'style="color: white; background:transparent;"' : '';
+            
+            tagPage += `<li class="page-item ${btnActive}">
+                            <a class="page-link" ${styleActive} href="/me/stored/courses/page-${i}">
                                 <span class="tag-id">${i}</span>
                             </a>
                         </li>`;
         }
-        return tagPageId;
+        return tagPage;
     },
 };
